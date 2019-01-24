@@ -10,13 +10,13 @@ module Config where
 import           Control.Concurrent                   (ThreadId)
 import           Control.Exception                    (throwIO)
 import           Control.Monad.Except                 (ExceptT, MonadError)
-import           Control.Monad.IO.Class
+import           Control.Monad.IO.Class               (liftIO)
 import           Control.Monad.Logger                 (MonadLogger (..))
 import           Control.Monad.Metrics                (Metrics, MonadMetrics,
                                                        getMetrics)
 import           Control.Monad.Reader                 (MonadIO, MonadReader,
                                                        ReaderT, asks)
-import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Class            (lift)
 import           Control.Monad.Trans.Maybe            (MaybeT (..), runMaybeT)
 import qualified Data.ByteString.Char8                as BS
 import           Data.Monoid                          ((<>))
@@ -28,6 +28,7 @@ import           Network.Wai.Handler.Warp             (Port)
 import           Network.Wai.Middleware.RequestLogger (logStdout, logStdoutDev)
 import           Servant                              (ServantErr)
 import           System.Environment                   (lookupEnv)
+import           System.IO.Error                      (userError)
 
 import           Logger
 
@@ -61,20 +62,20 @@ data Config
     }
 
 instance Monad m => MonadMetrics (AppT m) where
-    getMetrics = asks Config.configMetrics
+  getMetrics = asks Config.configMetrics
 
 -- | Katip instance for @AppT m@
 instance MonadIO m => Katip (AppT m) where
-    getLogEnv = asks configLogEnv
-    localLogEnv = error "not implemented"
+  getLogEnv   = asks configLogEnv
+  localLogEnv = error "not implemented"
 
 -- | MonadLogger instance to use within @AppT m@
 instance MonadIO m => MonadLogger (AppT m) where
-    monadLoggerLog = adapt logMsg
+  monadLoggerLog = adapt logMsg
 
 -- | MonadLogger instance to use in @makePool@
 instance MonadIO m => MonadLogger (KatipT m) where
-    monadLoggerLog = adapt logMsg
+  monadLoggerLog = adapt logMsg
 
 -- | Right now, we're distinguishing between three environments. We could
 -- also add a @Staging@ environment if we needed to.
@@ -95,8 +96,8 @@ setLogger Production  = logStdout
 katipLogger :: LogEnv -> Middleware
 katipLogger env app req respond = runKatipT env $ do
     -- todo: log proper request data
-    logMsg "web" InfoS "todo: received some request"
-    liftIO $ app req respond
+  logMsg "web" InfoS "todo: received some request"
+  liftIO $ app req respond
 
 -- | This function creates a 'ConnectionPool' for the given environment.
 -- For 'Development' and 'Test' environments, we use a stock and highly
@@ -105,9 +106,9 @@ katipLogger env app req respond = runKatipT env $ do
 -- deployment application.
 makePool :: Environment -> LogEnv -> IO ConnectionPool
 makePool Test env =
-    runKatipT env (createPostgresqlPool (connStr "-test") (envPool Test))
+  runKatipT env (createPostgresqlPool (connStr "") (envPool Test))
 makePool Development env =
-    runKatipT env $ createPostgresqlPool (connStr "") (envPool Development)
+  runKatipT env $ createPostgresqlPool (connStr "") (envPool Development)
 makePool Production env = do
     -- This function makes heavy use of the 'MaybeT' monad transformer, which
     -- might be confusing if you're not familiar with it. It allows us to
@@ -116,29 +117,20 @@ makePool Production env = do
     -- @a@. If we just had @IO (Maybe a)@, then binding out of the IO would
     -- give us a @Maybe a@, which would make the code quite a bit more
     -- verbose.
-    pool <- runMaybeT $ do
-        let keys = [ "host="
-                   , "port="
-                   , "user="
-                   , "password="
-                   , "dbname="
-                   ]
-            envs = [ "PGHOST"
-                   , "PGPORT"
-                   , "PGUSER"
-                   , "PGPASS"
-                   , "PGDATABASE"
-                   ]
-        envVars <- traverse (MaybeT . lookupEnv) envs
-        let prodStr = BS.intercalate " " . zipWith (<>) keys $ BS.pack <$> envVars
-        lift $ runKatipT env $ createPostgresqlPool prodStr (envPool Production)
-    case pool of
-        -- If we don't have a correct database configuration, we can't
-        -- handle that in the program, so we throw an IO exception. This is
-        -- one example where using an exception is preferable to 'Maybe' or
-        -- 'Either'.
-         Nothing -> throwIO (userError "Database Configuration not present in environment.")
-         Just a -> return a
+  pool <- runMaybeT $ do
+    let keys = ["host=", "port=", "user=", "password=", "dbname="]
+        envs = ["PGHOST", "PGPORT", "PGUSER", "PGPASS", "PGDATABASE"]
+    envVars <- traverse (MaybeT . lookupEnv) envs
+    let prodStr = BS.intercalate " " . zipWith (<>) keys $ BS.pack <$> envVars
+    lift $ runKatipT env $ createPostgresqlPool prodStr (envPool Production)
+  case pool of
+      -- If we don't have a correct database configuration, we can't
+      -- handle that in the program, so we throw an IO exception. This is
+      -- one example where using an exception is preferable to 'Maybe' or
+      -- 'Either'.
+    Nothing ->
+      throwIO (userError "Database Configuration not present in environment.")
+    Just a -> return a
 
 -- | The number of pools to use for a given environment.
 envPool :: Environment -> Int
@@ -149,4 +141,7 @@ envPool Production  = 8
 -- | A basic 'ConnectionString' for local/test development. Pass in either
 -- @""@ for 'Development' or @"test"@ for 'Test'.
 connStr :: BS.ByteString -> ConnectionString
-connStr sfx = "host=localhost dbname=perservant" <> sfx <> " user=test password=test port=5432"
+connStr sfx =
+  "host=localhost dbname=postgres"
+    <> sfx
+    <> " user=ubuntu password=letme!n port=5432"

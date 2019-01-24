@@ -15,12 +15,10 @@ import           Servant.JS                  (vanillaJS, writeJSForAPI)
 
 import           Config                      (AppT (..))
 import           Control.Monad.Metrics       (increment, metricsCounters)
-import           Data.IORef                  (readIORef)
 import           Data.HashMap.Lazy           (HashMap)
 import           Data.Text                   (Text)
 import           Lens.Micro                  ((^.))
-import           Models                      (User (User), runDb, userEmail,
-                                              userName)
+import           Models
 import qualified Models                      as Md
 import qualified System.Metrics.Counter      as Counter
 
@@ -50,6 +48,17 @@ singleUser str = do
     increment "singleUser"
     logDebugNS "web" "singleUser"
     maybeUser <- runDb (selectFirst [Md.UserName ==. str] [])
+    case maybeUser of
+         Nothing ->
+            throwError err404
+         Just person ->
+            return person
+
+singleActor :: MonadIO m => Text -> AppT m (Entity Actor)
+singleActor str = do
+    increment "singleActor"
+    logDebugNS "web" "singleActor"
+    maybeUser <- runDb (selectFirst [Md.ActorFirstName ==. str] [])
     case maybeUser of
          Nothing ->
             throwError err404

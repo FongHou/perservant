@@ -1,3 +1,4 @@
+cabal-version:       2.2
 name:                servant-persistent
 version:             0.2.0.0
 synopsis:            Brief example on using persistent with servant
@@ -9,7 +10,6 @@ maintainer:          parsonsmatt@gmail.com
 copyright:           2016 Matt Parsons
 category:            Web
 build-type:          Simple
-cabal-version:       >=1.18
 
 source-repository head
     type:
@@ -21,7 +21,8 @@ executable perservant
     main-is:
         Main.hs
     build-depends:
-        base >= 4.9 && < 5.0
+        base-noprelude
+      , relude
       , servant-persistent
       , persistent-postgresql
       , wai
@@ -33,6 +34,7 @@ executable perservant
       , microlens
       , ekg
       , ekg-core
+      , pretty-simple
     hs-source-dirs:
         app
     default-language:
@@ -46,7 +48,8 @@ library
     hs-source-dirs:
         src
     exposed-modules:
-        Config
+        Prelude
+      , Config
       , Init
       , Models
       , Api
@@ -54,7 +57,8 @@ library
       , Logger
       , DevelMain
     build-depends:
-        base >= 4.9 && < 5.0
+        base-noprelude
+      , relude
       , aeson
       , bytestring
       , containers
@@ -62,7 +66,7 @@ library
       , ekg-core
       , fast-logger
       , foreign-store
-      , katip >= 0.5.0.2 && < 0.6
+      , katip
       , microlens
       , monad-control
       , monad-logger
@@ -72,9 +76,9 @@ library
       , persistent-postgresql
       , persistent-template
       , safe
-      , servant >= 0.13 && < 0.14
-      , servant-js >= 0.9 && < 0.10
-      , servant-server >= 0.13 && < 0.14
+      , servant
+      , servant-js
+      , servant-server
       , text
       , transformers
       , unordered-containers
@@ -97,18 +101,20 @@ test-suite servant-persistent-test
         ApiSpec
         UserDbSpec
     build-depends:
-        base
+        base-noprelude
+      , relude
       , persistent
       , persistent-postgresql
       , servant-persistent
-      , servant >= 0.13 && < 0.14
-      , servant-server >= 0.13 && < 0.14
+      , servant
+      , servant-server
       , QuickCheck
       , hspec
       , mtl
       , transformers
       , text
       , monad-metrics
+      , pretty-simple
     ghc-options:
         -threaded -rtsopts -with-rtsopts=-N -fwarn-unused-imports
     default-language:

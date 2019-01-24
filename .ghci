@@ -1,0 +1,8 @@
+
+import Relude
+
+import Text.Pretty.Simple (pPrint)
+
+:def pp   \_ -> return (":set -interactive-print pPrint")
+:def nopp \_ -> return (":set -interactive-print System.IO.print")
+

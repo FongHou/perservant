@@ -28,10 +28,18 @@ User json
     deriving Show Eq
 |]
 
+share [mkPersist sqlSettings] [persistLowerCase|
+Actor
+     firstName Text
+     lastName Text
+     Id sql=actor_id
+     deriving Show Eq
+|]
+
 doMigrations :: SqlPersistT IO ()
 doMigrations = runMigration migrateAll
 
 runDb :: (MonadReader Config m, MonadIO m) => SqlPersistT IO b -> m b
 runDb query = do
-    pool <- asks configPool
-    liftIO $ runSqlPool query pool
+  pool <- asks configPool
+  liftIO $ runSqlPool query pool

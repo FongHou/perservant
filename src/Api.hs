@@ -15,8 +15,8 @@ import           Config               (AppT (..), Config (..))
 -- | This is the function we export to run our 'UserAPI'. Given
 -- a 'Config', we return a WAI 'Application' which any WAI compliant server
 -- can run.
-userApp :: Config -> Application
-userApp cfg = serve userApi (appToServer cfg)
+-- userApp :: Config -> Application
+-- userApp cfg = serve userApi (appToServer cfg)
 
 -- | This functions tells Servant how to run the 'App' monad with our
 -- 'server' function.
@@ -48,5 +48,4 @@ appApi = Proxy
 -- | Finally, this function takes a configuration and runs our 'UserAPI'
 -- alongside the 'Raw' endpoint that serves all of our files.
 app :: Config -> Application
-app cfg =
-    serve appApi (appToServer cfg :<|> files)
+app cfg = serve appApi (appToServer cfg :<|> files)
