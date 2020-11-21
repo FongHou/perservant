@@ -10,6 +10,7 @@ cabal-dev
 .virtualenv
 .hpc
 .hsenv
+.hspec-failures
 .cabal-sandbox/
 cabal.sandbox.config
 *.prof
@@ -31,3 +32,4 @@ cabal.sandbox.config
 *.prof
 *.aux
 *.hp
+tags

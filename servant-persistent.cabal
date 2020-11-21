@@ -17,55 +17,51 @@ source-repository head
     location:
         https://www.github.com/parsonsmatt/servant-persistent
 
-executable perservant
-    main-is:
-        Main.hs
-    build-depends:
-        base-noprelude
-      , relude
-      , servant-persistent
-      , persistent-postgresql
-      , wai
-      , warp
-      , monad-logger
-      , safe
-      , monad-metrics
-      , wai-middleware-metrics
-      , microlens
-      , ekg
-      , ekg-core
-      , pretty-simple
-    hs-source-dirs:
-        app
-    default-language:
-        Haskell2010
+common default-settings
+    default-extensions:
+        NoImplicitPrelude
+      , BangPatterns
+      , BinaryLiterals
+      , ConstraintKinds
+      , DataKinds
+      , DeriveGeneric
+      , EmptyCase
+      , EmptyDataDecls
+      , FlexibleContexts
+      , FlexibleInstances
+      , FunctionalDependencies
+      , GADTs
+      , GeneralizedNewtypeDeriving
+      , InstanceSigs
+      , KindSignatures
+      , LambdaCase
+      , MultiParamTypeClasses
+      , MultiWayIf
+      , NamedFieldPuns
+      , OverloadedStrings
+      , PartialTypeSignatures
+      , PatternSynonyms
+      , PolyKinds
+      , RankNTypes
+      , RecordWildCards
+      , ScopedTypeVariables
+      , StandaloneDeriving
+      , TupleSections
+      , TypeApplications
+      , TypeFamilies
+      , TypeOperators
+      , ViewPatterns
     ghc-options:
-        -fwarn-unused-imports
-
-library
-    default-language:
-        Haskell2010
-    hs-source-dirs:
-        src
-    exposed-modules:
-        Prelude
-      , Config
-      , Init
-      , Models
-      , Api
-      , Api.User
-      , Logger
-      , DevelMain
+      -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Wno-name-shadowing -Wno-unused-top-binds -fhide-source-paths
     build-depends:
-        base-noprelude
-      , relude
+        base
       , aeson
       , bytestring
       , containers
       , ekg
       , ekg-core
+      , exceptions
       , fast-logger
-      , foreign-store
       , katip
       , microlens
       , monad-control
@@ -75,10 +71,15 @@ library
       , persistent
       , persistent-postgresql
       , persistent-template
+      , relude
+      , resource-pool
       , safe
+      , safe-exceptions
+      , say
       , servant
       , servant-js
       , servant-server
+      , text
       , text
       , transformers
       , unordered-containers
@@ -86,11 +87,50 @@ library
       , wai-extra
       , wai-middleware-metrics
       , warp
-      , resource-pool
+    mixins:   base hiding (Prelude)
+
+executable servant-persistent
+    import: default-settings
+    hs-source-dirs:
+        app
+    main-is:
+        Main.hs
+    other-modules:
+        DevelMain
+    build-depends:
+        servant-persistent
+      , foreign-store
+      , microlens
+      , monad-logger
+      , monad-metrics
+      , persistent-postgresql
+      , pretty-simple
+      , wai
+      , wai-middleware-metrics
+      , warp
     ghc-options:
-        -fwarn-unused-imports
+        -threaded -rtsopts -with-rtsopts=-N
+    default-language:
+        Haskell2010
+
+library
+    import: default-settings
+    hs-source-dirs:
+        src
+    exposed-modules:
+        Imports
+      , Config
+      , Init
+      , Models
+      , Api
+      , Api.User
+      , Logger
+    build-depends:
+    default-language:
+        Haskell2010
 
 test-suite servant-persistent-test
+    import: default-settings
     type:
         exitcode-stdio-1.0
     hs-source-dirs:
@@ -101,21 +141,10 @@ test-suite servant-persistent-test
         ApiSpec
         UserDbSpec
     build-depends:
-        base-noprelude
-      , relude
-      , persistent
-      , persistent-postgresql
-      , servant-persistent
-      , servant
-      , servant-server
-      , QuickCheck
+        servant-persistent
       , hspec
-      , mtl
-      , transformers
-      , text
-      , monad-metrics
-      , pretty-simple
+      , QuickCheck
     ghc-options:
-        -threaded -rtsopts -with-rtsopts=-N -fwarn-unused-imports
+        -threaded -rtsopts -with-rtsopts=-N
     default-language:
         Haskell2010

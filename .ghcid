@@ -1,0 +1,1 @@
+--command="stack ghci --ghci-options='-fobject-code -fno-break-on-exception -fno-break-on-error -ferror-spans -v1 -j'" --warnings --allow-eval --restart=./servant-persistent.cabal --restart=./stack.yaml
