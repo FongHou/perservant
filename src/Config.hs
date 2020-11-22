@@ -5,7 +5,7 @@ module Config where
 
 import Control.Concurrent (ThreadId)
 import Control.Exception.Safe (throwIO)
-import Control.Monad.Catch
+import Control.Monad.Catch (MonadThrow)
 import Control.Monad.Except (MonadError)
 import Control.Monad.Logger (MonadLogger (..))
 import Control.Monad.Metrics

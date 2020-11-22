@@ -11,6 +11,7 @@ import qualified Data.Pool as Pool
 import qualified Data.Text as Text
 import Data.Typeable
 import Database.Persist.Postgresql (runSqlPool)
+import Imports
 import qualified Katip
 import Lens.Micro ((^.))
 import Logger (defaultLogEnv)
@@ -22,7 +23,6 @@ import Safe (readMay)
 import Say
 import System.Environment (lookupEnv)
 import System.Remote.Monitoring (forkServer, serverMetricStore, serverThreadId)
-import Imports
 
 -- | An action that creates a WAI 'Application' together with its resources,
 --   runs it, and tears it down on exit
@@ -75,24 +75,30 @@ withConfig action = do
   say $ "on port:" <> tshow port
   env <- lookupSetting "ENV" Development
   say $ "on env: " <> tshow env
-  bracket defaultLogEnv (\x -> say "closing katip scribes" >> Katip.closeScribes x) $ \logEnv -> do
-    say $ "got log env"
-    !pool <- makePool env logEnv `onException` say "exception in makePool"
-    say $ "got pool "
-    bracket (forkServer "localhost" 8082) (\x -> say "closing ekg" >> do killThread $ serverThreadId x) $ \ekgServer -> do
-      say "forked ekg server"
-      let store = serverMetricStore ekgServer
-      metr <- M.initializeWith store
-      say "got metrics"
-      action
-        Config
-          { configPool = pool,
-            configEnv = env,
-            configMetrics = metr,
-            configLogEnv = logEnv,
-            configPort = port,
-            configEkgServer = serverThreadId ekgServer
-          }
+  bracket
+    defaultLogEnv
+    (\x -> say "closing katip scribes" >> Katip.closeScribes x)
+    $ \logEnv -> do
+      say $ "got log env"
+      !pool <- makePool env logEnv `onException` say "exception in makePool"
+      say $ "got pool "
+      bracket
+        (forkServer "localhost" 8082)
+        (\x -> say "closing ekg" >> do killThread $ serverThreadId x)
+        $ \ekgServer -> do
+          say "forked ekg server"
+          let store = serverMetricStore ekgServer
+          metr <- M.initializeWith store
+          say "got metrics"
+          action
+            Config
+              { configPool = pool,
+                configEnv = env,
+                configMetrics = metr,
+                configLogEnv = logEnv,
+                configPort = port,
+                configEkgServer = serverThreadId ekgServer
+              }
 
 -- | Takes care of cleaning up 'Config' resources
 shutdownApp :: Config -> IO ()
