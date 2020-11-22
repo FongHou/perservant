@@ -85,8 +85,6 @@ withConfig action = do
     bracket (forkServer "localhost" 8082) (\x -> say "closing ekg" >> do killThread $ serverThreadId x) $ \ekgServer -> do
       say "forked ekg server"
       let store = serverMetricStore ekgServer
-      _waiMetrics <- registerWaiMetrics store `onException` say "exception in registerWaiMetrics"
-      say "registered wai metrics"
       metr <- M.initializeWith store
       say "got metrics"
       action
