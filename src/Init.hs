@@ -8,7 +8,6 @@ import Control.Exception.Safe
 import qualified Control.Monad.Metrics as M
 import Data.Monoid
 import qualified Data.Pool as Pool
-import qualified Data.Text as Text
 import Data.Typeable
 import Database.Persist.Postgresql (runSqlPool)
 import Imports
@@ -56,9 +55,9 @@ initialize cfg = do
         say $
           mconcat
             [ "exception in doMigrations, type: ",
-              tshow (typeOf e),
+              show (typeOf e),
               ", shown: ",
-              tshow e
+              show e
             ]
         throwIO e
       say "okay all done"
@@ -72,16 +71,16 @@ withConfig :: (Config -> IO a) -> IO a
 withConfig action = do
   say "acquireConfig"
   port <- lookupSetting "PORT" 8081
-  say $ "on port:" <> tshow port
+  say $ "on port:" <> show port
   env <- lookupSetting "ENV" Development
-  say $ "on env: " <> tshow env
+  say $ "on env: " <> show env
   bracket
     defaultLogEnv
     (\x -> say "closing katip scribes" >> Katip.closeScribes x)
     $ \logEnv -> do
-      say $ "got log env"
+      say "got log env"
       !pool <- makePool env logEnv `onException` say "exception in makePool"
-      say $ "got pool "
+      say "got pool "
       bracket
         (forkServer "localhost" 8082)
         (\x -> say "closing ekg" >> do killThread $ serverThreadId x)
@@ -130,6 +129,3 @@ lookupSetting env def = do
             "]] for environment variable ",
             toText env
           ]
-
-tshow :: Show a => a -> Text
-tshow = Text.pack . show

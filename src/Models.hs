@@ -5,7 +5,6 @@
 
 module Models where
 
-import Imports
 import Config (Config, configPool)
 import Database.Persist.Sql (SqlPersistT, runMigration, runSqlPool)
 import Database.Persist.TH
@@ -15,6 +14,7 @@ import Database.Persist.TH
     share,
     sqlSettings,
   )
+import Imports
 
 share
   [mkPersist sqlSettings, mkMigrate "migrateAll"]
@@ -23,16 +23,6 @@ User json
     name Text
     email Text
     deriving Show Eq
-|]
-
-share
-  [mkPersist sqlSettings]
-  [persistLowerCase|
-Actor
-     firstName Text
-     lastName Text
-     Id sql=actor_id
-     deriving Show Eq
 |]
 
 doMigrations :: SqlPersistT IO ()

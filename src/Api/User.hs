@@ -44,15 +44,6 @@ singleUser str = do
     Nothing -> throwM err404
     Just person -> return person
 
-singleActor :: (MonadThrow m, MonadIO m) => Text -> AppT m (Entity Actor)
-singleActor str = do
-  increment "singleActor"
-  logDebugNS "web" "singleActor"
-  maybeUser <- runDb (selectFirst [Md.ActorFirstName ==. str] [])
-  case maybeUser of
-    Nothing -> throwM err404
-    Just person -> return person
-
 -- | Creates a user in the database.
 createUser :: MonadIO m => User -> AppT m Int64
 createUser p = do

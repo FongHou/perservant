@@ -15,14 +15,12 @@ module DevelMain where
 
 import Control.Concurrent (ThreadId, killThread, myThreadId)
 import Control.Exception.Safe
-import Control.Monad
-import Data.Monoid
 import Data.Typeable
-import Foreign.Store (Store (..), lookupStore, readStore, storeAction, withStore)
-import Init (runAppDevel, tshow)
-import Say
-import System.IO
+import Foreign.Store
 import Imports
+import Init (runAppDevel)
+import Say ( say )
+import System.IO
 
 -- | Start or restart the server.
 -- newStore is from foreign-store.
@@ -49,9 +47,9 @@ update = do
     -- shut the server down with killThread and wait for the done signal
     restartAppInNewThread :: Store (IORef ThreadId) -> IO ()
     restartAppInNewThread tidStore = modifyStoredIORef tidStore $ \tid -> do
-      say $ "killing thread: " <> tshow tid
+      say $ "killing thread: " <> show tid
       killThread tid
-      say $ "taking mvar"
+      say "taking mvar"
       withStore doneStore takeMVar
       readStore doneStore >>= start
     start ::
@@ -64,8 +62,8 @@ update = do
                say "in forkFinally"
                runAppDevel `catch` \(SomeException e) -> do
                  say "!!! exception in runAppDevel !!!"
-                 say $ "X    exception type: " <> tshow (typeOf e)
-                 say $ "X    exception     : " <> tshow e
+                 say $ "X    exception type: " <> show (typeOf e)
+                 say $ "X    exception     : " <> show e
                say "runAppDevel terminated"
            )
         `catch` ( \(SomeException err) -> do
@@ -73,7 +71,7 @@ update = do
                     hFlush stdout
                     hFlush stderr
                     putMVar done ()
-                    say $ "Got Exception: " <> tshow err
+                    say $ "Got Exception: " <> show err
                     throwIO err
                 )
         `finally` ( do
