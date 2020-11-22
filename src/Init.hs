@@ -1,6 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Init where
 
 import Api (app)

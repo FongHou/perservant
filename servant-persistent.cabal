@@ -24,7 +24,6 @@ common default-settings
       , BinaryLiterals
       , ConstraintKinds
       , DataKinds
-      , DeriveGeneric
       , EmptyCase
       , EmptyDataDecls
       , FlexibleContexts

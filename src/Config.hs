@@ -1,13 +1,8 @@
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE StrictData #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Config where
 
-import Imports
 import Control.Concurrent (ThreadId)
 import Control.Exception.Safe (throwIO)
 import Control.Monad.Catch
@@ -24,13 +19,14 @@ import Database.Persist.Postgresql
     ConnectionString,
     createPostgresqlPool,
   )
+import Imports
 import Logger
 import Network.Wai (Middleware)
 import Network.Wai.Handler.Warp (Port)
 import Network.Wai.Middleware.RequestLogger (logStdout, logStdoutDev)
+import Servant.Server (ServerError)
 import System.Environment (lookupEnv)
 import System.IO.Error (userError)
-import Servant.Server (ServerError)
 
 -- | This type represents the effects we want to have for our application.
 -- We wrap the standard Servant monad with 'ReaderT Config', which gives us
@@ -40,8 +36,7 @@ import Servant.Server (ServerError)
 -- By encapsulating the effects in our newtype, we can add layers to the
 -- monad stack without having to modify code that uses the current layout.
 newtype AppT m a = AppT
-  { runApp :: ReaderT Config (ExceptT ServerError m) a
-  }
+  {runApp :: ReaderT Config (ExceptT ServerError m) a}
   deriving
     ( Functor,
       Applicative,
