@@ -5,6 +5,7 @@ import Api.User (generateJavaScript)
 import Config (Config (..), Environment (..), makePool, setLogger)
 import Control.Concurrent (killThread)
 import Control.Exception.Safe
+import Control.Lens
 import qualified Control.Monad.Metrics as M
 import Data.Monoid
 import qualified Data.Pool as Pool
@@ -12,7 +13,6 @@ import Data.Typeable
 import Database.Persist.Postgresql (runSqlPool)
 import Imports
 import qualified Katip
-import Lens.Micro ((^.))
 import Logger (defaultLogEnv)
 import Models (doMigrations)
 import Network.Wai (Application)
@@ -51,15 +51,12 @@ initialize cfg = do
     (\_ -> say "migrations complete")
     $ \_ -> do
       say "actually running migrations"
-      runSqlPool doMigrations (configPool cfg) `catch` \(SomeException e) -> do
-        say $
-          mconcat
-            [ "exception in doMigrations, type: ",
-              show (typeOf e),
-              ", shown: ",
-              show e
-            ]
-        throwIO e
+      runSqlPool doMigrations (configPool cfg)
+        `catch` \(SomeException e) -> do
+          say $ mconcat
+              [ "exception in doMigrations, type: ",
+                show (typeOf e), ", shown: ", show e ]
+          throwIO e
       say "okay all done"
 
   say "generate js"

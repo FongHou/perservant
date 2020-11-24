@@ -2,7 +2,8 @@ flags: {}
 packages:
 - '.'
 extra-deps:
-- base-noprelude-4.13.0.0
+- base-prelude-1.4
+- opaleye-0.7.1.0
 - wai-middleware-metrics-0.2.4
 
 resolver: lts-16.22

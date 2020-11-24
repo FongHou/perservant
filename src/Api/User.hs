@@ -7,7 +7,7 @@ import Control.Monad.Logger (logDebugNS)
 import Control.Monad.Metrics (increment, metricsCounters)
 import qualified Control.Monad.Metrics as Metrics
 import Database.Persist.Postgresql
-import Lens.Micro ((^.))
+import Control.Lens
 import Models
 import qualified Models as Md
 import Servant
@@ -24,7 +24,7 @@ userApi :: Proxy UserAPI
 userApi = Proxy
 
 -- | The server that runs the UserAPI
-userServer :: (MonadThrow m, MonadIO m) => ServerT UserAPI (AppT m)
+userServer :: (MonadIO m, MonadThrow m) => ServerT UserAPI (AppT m)
 userServer = allUsers :<|> singleUser :<|> createUser :<|> waiMetrics
 
 -- | Returns all users in the database.

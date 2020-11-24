@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -6,6 +6,7 @@
 module Models where
 
 import Config (Config, configPool)
+import Data.Time
 import Database.Persist.Sql (SqlPersistT, runMigration, runSqlPool)
 import Database.Persist.TH
   ( mkMigrate,
@@ -22,6 +23,29 @@ share
 User json
     name Text
     email Text
+    deriving Show Eq
+|]
+
+share
+  [mkPersist sqlSettings]
+  [persistLowerCase|
+Actor json sql=actor
+    Id sql=actor_id
+    firstName Text
+    lastName Text
+    lastUpdate UTCTime
+    deriving Show Eq
+
+Film json sql=film
+    Id sql=film_id
+    title Text
+    description Text
+    releaseYear Int sqltype=year
+    languageId Int
+    length Int
+    rentalDuration Int
+    rentalRate Rational sql=numeric(4,2)
+    lastUpdate UTCTime
     deriving Show Eq
 |]
 

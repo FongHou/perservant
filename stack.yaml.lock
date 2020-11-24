@@ -5,12 +5,19 @@
 
 packages:
 - completed:
-    hackage: base-noprelude-4.13.0.0@sha256:3cccbfda38e1422ca5cc436d58858ba51ff9114d2ed87915a6569be11e4e5a90,6842
+    hackage: base-prelude-1.4@sha256:feea99326853023fa9f908308383a7f9802e40f2d241b83dac57b266b202bda6,1412
     pantry-tree:
-      size: 112
-      sha256: 90db92c8401880187ce642c5345407bcbd9546ea235524dd445cab2566ee3db1
+      size: 271
+      sha256: 89c097b83439c4b044b6ae8e43e6cee790ac12ab51cd9f47273b38237fd69eea
   original:
-    hackage: base-noprelude-4.13.0.0
+    hackage: base-prelude-1.4
+- completed:
+    hackage: opaleye-0.7.1.0@sha256:38c3b7f33144eae428f24b277e9de7ec0c5b9dc8ed3b55c3e2078cf4acb5c893,6145
+    pantry-tree:
+      size: 5907
+      sha256: 97b671f28bac28a6dacad1c621059eac5667e306a406e8e8967eb204cb827aca
+  original:
+    hackage: opaleye-0.7.1.0
 - completed:
     hackage: wai-middleware-metrics-0.2.4@sha256:d6b6916acd41aaef4ca59a839d40a3a377f9df784ae49fd4c64926ae916b6ba2,2890
     pantry-tree:
