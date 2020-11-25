@@ -52,7 +52,7 @@ spec =
         let user = User (T.pack "username") (T.pack "email")
         dbUser <-
           runAppToIO config $ do
-            runDb $ insert user
+            _ <- runDb $ insert user
             Entity _ user <- singleUser (T.pack "username")
             return user
         dbUser `shouldBe` user

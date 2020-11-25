@@ -24,6 +24,12 @@ common default-settings
       , BinaryLiterals
       , ConstraintKinds
       , DataKinds
+      , DeriveDataTypeable
+      , DeriveGeneric
+      , DeriveFoldable
+      , DeriveFunctor
+      , DeriveTraversable
+      , DerivingVia
       , EmptyCase
       , EmptyDataDecls
       , FlexibleContexts
