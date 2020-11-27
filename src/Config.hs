@@ -8,17 +8,11 @@ import Control.Exception.Safe (throwIO)
 import Control.Monad.Catch (MonadThrow)
 import Control.Monad.Except (MonadError)
 import Control.Monad.Logger (MonadLogger (..))
-import Control.Monad.Metrics
-  ( Metrics,
-    MonadMetrics,
-    getMetrics,
-  )
+import Control.Monad.Metrics (Metrics, MonadMetrics, getMetrics)
 import qualified Data.ByteString.Char8 as BS
-import Database.Persist.Postgresql
-  ( ConnectionPool,
-    ConnectionString,
-    createPostgresqlPool,
-  )
+import Data.Pool
+import Database.Persist.Postgresql (ConnectionString, SqlBackend, createPostgresqlPool)
+import Database.PostgreSQL.Simple as PG
 import Imports
 import Logger
 import Network.Wai (Middleware)
@@ -52,7 +46,8 @@ type App = AppT IO
 -- | The Config for our application is (for now) the 'Environment' we're
 -- running in and a Persistent 'ConnectionPool'.
 data Config = Config
-  { configPool :: ConnectionPool,
+  { configPool :: Pool SqlBackend,
+    configPGPool :: Pool PG.Connection,
     configEnv :: Environment,
     configMetrics :: Metrics,
     configEkgServer :: ThreadId,
@@ -103,11 +98,15 @@ katipLogger env app req respond = runKatipT env $ do
 -- insecure connection string. The 'Production' environment acquires the
 -- information from environment variables that are set by the keter
 -- deployment application.
-makePool :: Environment -> LogEnv -> IO ConnectionPool
-makePool Test env =
-  runKatipT env (createPostgresqlPool (connStr "") (envPool Test))
-makePool Development env =
-  runKatipT env $ createPostgresqlPool (connStr "") (envPool Development)
+makePool :: Environment -> LogEnv -> IO (Pool SqlBackend, Pool Connection)
+makePool Test env = do
+  pool1 <- runKatipT env (createPostgresqlPool (connStr "") (envPool Test))
+  pool2 <- createPool (PG.connectPostgreSQL (connStr "")) PG.close (envPool Test) 60000 1
+  return (pool1, pool2)
+makePool Development env = do
+  pool1 <- runKatipT env $ createPostgresqlPool (connStr "") (envPool Development)
+  pool2 <- createPool (PG.connectPostgreSQL (connStr "")) PG.close (envPool Development) 60000 1
+  return (pool1, pool2)
 makePool Production env = do
   -- This function makes heavy use of the 'MaybeT' monad transformer, which
   -- might be confusing if you're not familiar with it. It allows us to
@@ -116,20 +115,22 @@ makePool Production env = do
   -- @a@. If we just had @IO (Maybe a)@, then binding out of the IO would
   -- give us a @Maybe a@, which would make the code quite a bit more
   -- verbose.
-  pool <- runMaybeT $ do
+  connStr <- runMaybeT $ do
     let keys = ["host=", "port=", "user=", "password=", "dbname="]
         envs = ["PGHOST", "PGPORT", "PGUSER", "PGPASS", "PGDATABASE"]
     envVars <- traverse (MaybeT . lookupEnv) envs
-    let prodStr = BS.intercalate " " . zipWith (<>) keys $ BS.pack <$> envVars
-    lift $ runKatipT env $ createPostgresqlPool prodStr (envPool Production)
-  case pool of
+    pure $ BS.intercalate " " . zipWith (<>) keys $ BS.pack <$> envVars
+  case connStr of
     -- If we don't have a correct database configuration, we can't
     -- handle that in the program, so we throw an IO exception. This is
     -- one example where using an exception is preferable to 'Maybe' or
     -- 'Either'.
     Nothing ->
       throwIO (userError "Database Configuration not present in environment.")
-    Just a -> return a
+    Just connStr -> do
+      pool1 <- runKatipT env $ createPostgresqlPool connStr (envPool Production)
+      pool2 <- createPool (PG.connectPostgreSQL connStr) PG.close (envPool Production) 60000 1
+      return (pool1, pool2)
 
 -- | The number of pools to use for a given environment.
 envPool :: Environment -> Int

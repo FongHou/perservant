@@ -76,7 +76,7 @@ withConfig action = do
     (\x -> say "closing katip scribes" >> Katip.closeScribes x)
     $ \logEnv -> do
       say "got log env"
-      !pool <- makePool env logEnv `onException` say "exception in makePool"
+      (pool1, pool2) <- makePool env logEnv `onException` say "exception in makePool"
       say "got pool "
       bracket
         (forkServer "localhost" 8082)
@@ -88,7 +88,8 @@ withConfig action = do
           say "got metrics"
           action
             Config
-              { configPool = pool,
+              { configPool = pool1,
+                configPGPool = pool2,
                 configEnv = env,
                 configMetrics = metr,
                 configLogEnv = logEnv,
@@ -101,6 +102,7 @@ shutdownApp :: Config -> IO ()
 shutdownApp cfg = do
   void $ Katip.closeScribes (configLogEnv cfg)
   Pool.destroyAllResources (configPool cfg)
+  Pool.destroyAllResources (configPGPool cfg)
   -- Monad.Metrics does not provide a function to destroy metrics store
   -- so, it'll hopefully get torn down when async exception gets thrown
   -- at metrics server process

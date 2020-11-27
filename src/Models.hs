@@ -26,29 +26,6 @@ User json
     deriving Show Eq
 |]
 
-share
-  [mkPersist sqlSettings]
-  [persistLowerCase|
-Actor json sql=actor
-    Id sql=actor_id
-    firstName Text
-    lastName Text
-    lastUpdate UTCTime
-    deriving Show Eq
-
-Film json sql=film
-    Id sql=film_id
-    title Text
-    description Text
-    releaseYear Int sqltype=year
-    languageId Int
-    length Int
-    rentalDuration Int
-    rentalRate Rational sql=numeric(4,2)
-    lastUpdate UTCTime
-    deriving Show Eq
-|]
-
 doMigrations :: SqlPersistT IO ()
 doMigrations = runMigration migrateAll
 

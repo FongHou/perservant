@@ -3,15 +3,18 @@ module UserDbSpec where
 import Api.User
 import Config (App, AppT (..), Config (..), Environment (..), makePool)
 import Control.Exception (throwIO)
+import Data.Pool ( withResource )
 import qualified Data.Text as T
+import Database
 import Database.Persist.Postgresql (Entity (..), deleteWhere, insert, runSqlPool)
 import Database.Persist.Sql (ConnectionPool)
 import Database.Persist.Types (Filter)
+import Imports
 import Init
 import Logger (defaultLogEnv)
 import Models
+import Opaleye
 import Test.Hspec
-import Imports
 
 runAppToIO :: Config -> App a -> IO a
 runAppToIO config app = do
@@ -24,14 +27,16 @@ setupTeardown :: (Config -> IO a) -> IO ()
 setupTeardown runTestsWith = do
   withConfig $ \cfg -> do
     env <- defaultLogEnv
-    pool <- makePool Test env
-    migrateDb pool
-    _ <- runTestsWith
-      cfg
-        { configEnv = Test,
-          configPool = pool
-        }
-    cleanDb pool
+    (pool1, pool2) <- makePool Test env
+    migrateDb pool1
+    _ <-
+      runTestsWith
+        cfg
+          { configEnv = Test,
+            configPool = pool1,
+            configPGPool = pool2
+          }
+    cleanDb pool1
   where
     migrateDb :: ConnectionPool -> IO ()
     migrateDb pool = runSqlPool doMigrations pool
@@ -56,3 +61,8 @@ spec =
             Entity _ user <- singleUser (T.pack "username")
             return user
         dbUser `shouldBe` user
+    describe "Actor" $ do
+      it "singleActor return 200 actors" $ \config -> do
+        res :: [Actor] <-
+          withResource (configPGPool config) $ \conn -> runSelect conn selectActorNoTS
+        length res `shouldBe` 200

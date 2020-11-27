@@ -61,6 +61,7 @@ common default-settings
     build-depends:
         base
       , aeson
+      , aeson-schemas
       , bytestring
       , containers
       , ekg
@@ -76,6 +77,9 @@ common default-settings
       , persistent
       , persistent-postgresql
       , persistent-template
+      , profunctors
+      , product-profunctors
+      , postgresql-simple
       , opaleye
       , relude
       , resource-pool
@@ -119,6 +123,7 @@ library
     exposed-modules:
         Imports
       , Config
+      , Database
       , Init
       , Models
       , Api

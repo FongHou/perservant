@@ -1,0 +1,13 @@
+cradle:
+  stack:
+    - path: "./app/Main.hs"
+      component: "servant-persistent:exe:servant-persistent"
+
+    - path: "./app/DevelMain.hs"
+      component: "servant-persistent:exe:servant-persistent"
+
+    - path: "./src"
+      component: "servant-persistent:lib"
+
+    - path: "./test"
+      component: "servant-persistent:test:servant-persistent-test"
