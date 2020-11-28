@@ -1,6 +1,6 @@
 module Init where
 
-import Api (app)
+import Api (mkApp)
 import Api.User (generateJavaScript)
 import Config (Config (..), Environment (..), makePool, setLogger)
 import Control.Concurrent (killThread)
@@ -62,7 +62,8 @@ initialize cfg = do
   say "generate js"
   generateJavaScript
   say "making app"
-  pure . logger . metrics waiMetrics . app $ cfg
+  app <- mkApp cfg
+  pure . logger . metrics waiMetrics $ app
 
 withConfig :: (Config -> IO a) -> IO a
 withConfig action = do

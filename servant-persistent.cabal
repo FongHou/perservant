@@ -87,8 +87,12 @@ common default-settings
       , safe-exceptions
       , say
       , servant
+      , servant-auth
+      , servant-auth-server
       , servant-js
       , servant-server
+      , servant-exceptions
+      , servant-exceptions-server
       , text
       , time
       , transformers

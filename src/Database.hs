@@ -4,8 +4,8 @@
 module Database where
 
 import Config
-import Data.Fixed
-import Data.Pool
+import Data.Fixed ( Pico )
+import Data.Pool as Pool
 import Data.Profunctor
 import Data.Profunctor.Product
 import Data.Profunctor.Product.Default (Default)
@@ -72,9 +72,9 @@ actorTable =
     p2
       ( pActor
           Actor
-            { actorId = optionalTableField "actor_id",
-              firstName = requiredTableField "first_name",
-              lastName = requiredTableField "last_name"
+            { actorId = tableField "actor_id",
+              firstName = tableField "first_name",
+              lastName = tableField "last_name"
             },
         timestamps
       )
@@ -82,14 +82,16 @@ actorTable =
 actorNoTS :: Table ActorWriter ActorReader
 actorNoTS = withoutTS actorTable
 
--- $> printSql selectActor
+-- $> import Opaleye
+--
+-- > runSelect conn $ selectActor & orderBy (desc lastName) :: IO [Actor]
 
-selectActor :: Select (ActorReader, F SqlTimestamptz)
+selectActor :: Select ActorReader
 selectActor = do
   (row@Actor {..}, lastUpdate) <- selectTable actorTable
   let time = mkUTCTime (2013, 1, 1) (0, 0, 0)
-  viaLateral restrict (lastUpdate .>= sqlUTCTime time)
-  pure (row, lastUpdate)
+  where_ (lastUpdate .>= toFields time)
+  pure row
 
 selectActorNoTS :: Select ActorReader
 selectActorNoTS = selectTable actorNoTS
@@ -97,7 +99,7 @@ selectActorNoTS = selectTable actorNoTS
 selectActorName :: Text -> Select (F SqlText, F SqlText)
 selectActorName name = do
   Actor {..} <- selectActorNoTS
-  viaLateral restrict (lastName .== sqlStrictText name)
+  where_ (lastName .== toFields name)
   pure (firstName, lastName)
 
 printSql :: Default Unpackspec a a => Select a -> IO ()
@@ -110,4 +112,6 @@ conn = unsafePerformIO $ PG.connectPostgreSQL (connStr "")
 withDb :: (MonadReader Config m, MonadIO m) => (Connection -> IO b) -> m b
 withDb query = do
   pool <- asks configPGPool
-  liftIO $ withResource pool query
+  liftIO $
+    Pool.withResource pool $ \conn ->
+      PG.withTransaction conn (query conn)
