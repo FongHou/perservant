@@ -20,18 +20,20 @@ source-repository head
 common default-settings
     default-extensions:
         NoImplicitPrelude
+      , NoMonomorphismRestriction
       , BangPatterns
       , BinaryLiterals
       , ConstraintKinds
       , DataKinds
       , DeriveDataTypeable
-      , DeriveGeneric
       , DeriveFoldable
       , DeriveFunctor
+      , DeriveGeneric
       , DeriveTraversable
       , DerivingVia
       , EmptyCase
       , EmptyDataDecls
+      , EmptyDataDeriving
       , FlexibleContexts
       , FlexibleInstances
       , FunctionalDependencies
@@ -43,6 +45,8 @@ common default-settings
       , MultiParamTypeClasses
       , MultiWayIf
       , NamedFieldPuns
+      , NegativeLiterals
+      , NumericUnderscores
       , OverloadedStrings
       , PartialTypeSignatures
       , PatternSynonyms
@@ -55,7 +59,6 @@ common default-settings
       , TypeApplications
       , TypeFamilies
       , TypeOperators
-      , ViewPatterns
     ghc-options:
       -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Wno-name-shadowing -Wno-unused-top-binds -fhide-source-paths
     build-depends:
@@ -96,6 +99,7 @@ common default-settings
       , text
       , time
       , transformers
+      , validation-selective
       , unordered-containers
       , wai
       , wai-extra
