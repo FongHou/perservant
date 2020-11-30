@@ -29,8 +29,8 @@ common default-settings
       , DeriveFoldable
       , DeriveFunctor
       , DeriveGeneric
+      , DeriveLift
       , DeriveTraversable
-      , DerivingVia
       , EmptyCase
       , EmptyDataDecls
       , EmptyDataDeriving
@@ -45,11 +45,12 @@ common default-settings
       , MultiParamTypeClasses
       , MultiWayIf
       , NamedFieldPuns
-      , NegativeLiterals
+      , NamedWildCards
       , NumericUnderscores
+      , OverloadedLists
       , OverloadedStrings
+      , ParallelListComp
       , PartialTypeSignatures
-      , PatternSynonyms
       , PolyKinds
       , RankNTypes
       , RecordWildCards
@@ -59,6 +60,7 @@ common default-settings
       , TypeApplications
       , TypeFamilies
       , TypeOperators
+      , ViewPatterns
     ghc-options:
       -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Wno-name-shadowing -Wno-unused-top-binds -fhide-source-paths
     build-depends:
