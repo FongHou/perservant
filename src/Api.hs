@@ -5,7 +5,7 @@ import Config (AppT (..), Config (..))
 import Control.Exception.Safe (MonadThrow)
 import Imports
 import Servant
-import Servant.Auth as SA
+-- import Servant.Auth as SA
 import Servant.Auth.Server as SAS
 
 -- | Since we also want to provide a minimal front end, we need to give
@@ -21,15 +21,15 @@ files = serveDirectoryFileServer "assets"
 -- always succeeds.
 type AppAPI = SecureAPI :<|> Raw
 
-type SecureAPI = Auth '[JWT] () :> UserAPI
-
-instance FromJWT ()
-
-instance ToJWT ()
+type SecureAPI = UserAPI
+-- type SecureAPI = Auth '[JWT] () :> UserAPI
+-- instance FromJWT ()
+-- instance ToJWT ()
 
 apiServer :: (MonadIO m, MonadThrow m) => ServerT SecureAPI (AppT m)
-apiServer (Authenticated _) = userServer
-apiServer _ = throwAll err401
+apiServer = userServer
+-- apiServer (Authenticated _) = userServer
+-- apiServer _ = throwAll err401
 
 -- | This functions tells Servant how to run the 'App' monad with our
 -- 'server' function.

@@ -23,6 +23,7 @@ common default-settings
       , NoMonomorphismRestriction
       , BangPatterns
       , BinaryLiterals
+      , BlockArguments
       , ConstraintKinds
       , DataKinds
       , DeriveDataTypeable
@@ -51,8 +52,8 @@ common default-settings
       , OverloadedLists
       , OverloadedStrings
       , ParallelListComp
-      , PartialTypeSignatures
       , PolyKinds
+      , PostfixOperators
       , RankNTypes
       , RecordWildCards
       , ScopedTypeVariables
@@ -61,7 +62,6 @@ common default-settings
       , TypeApplications
       , TypeFamilies
       , TypeOperators
-      , ViewPatterns
     ghc-options:
       -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Wno-name-shadowing -Wno-unused-top-binds -fhide-source-paths
     build-depends:

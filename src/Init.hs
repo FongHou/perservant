@@ -18,7 +18,6 @@ import Models (doMigrations)
 import Network.Wai (Application)
 import Network.Wai.Handler.Warp (run)
 import Network.Wai.Metrics (metrics, registerWaiMetrics)
-import Safe (readMay)
 import Say
 import System.Environment (lookupEnv)
 import System.Remote.Monitoring (forkServer, serverMetricStore, serverThreadId)
@@ -119,7 +118,7 @@ lookupSetting env def = do
     Nothing ->
       return def
     Just str ->
-      maybe (handleFailedRead str) return (readMay str)
+      maybe (handleFailedRead str) return (readMaybe str)
   where
     handleFailedRead str =
       error $
