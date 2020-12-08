@@ -31,6 +31,7 @@ common default-settings
       , DeriveGeneric
       , DeriveLift
       , DeriveTraversable
+      , DerivingStrategies
       , EmptyCase
       , EmptyDataDecls
       , EmptyDataDeriving
@@ -67,42 +68,52 @@ common default-settings
         base
       , aeson
       , aeson-schemas
+      , async
       , bytestring
+      , conduit
       , containers
-      , ekg
-      , ekg-core
       , exceptions
-      , fast-logger
-      , katip
+      , foldl
+      , generic-lens
       , lens
+      , lens-aeson
       , monad-control
-      , monad-logger
-      , monad-metrics
       , mtl
-      , persistent
-      , persistent-postgresql
-      , persistent-template
       , profunctors
-      , product-profunctors
-      , postgresql-simple
-      , opaleye
       , relude
-      , resource-pool
-      , safe
       , safe-exceptions
       , say
-      , servant
-      , servant-auth
-      , servant-auth-server
-      , servant-js
-      , servant-server
-      , servant-exceptions
-      , servant-exceptions-server
+      , stm
       , text
       , time
       , transformers
-      , validation-selective
+      , typerep-map
       , unordered-containers
+      , validation-selective
+      , vector
+      -------------------------------------------
+      , ekg
+      , ekg-core
+      , fast-logger
+      , http-conduit
+      , http-types
+      , katip
+      , monad-logger
+      , monad-metrics
+      , opaleye
+      , persistent
+      , persistent-postgresql
+      , persistent-template
+      , postgresql-simple
+      , product-profunctors
+      , resource-pool
+      , servant
+      , servant-auth
+      , servant-auth-server
+      , servant-exceptions
+      , servant-exceptions-server
+      , servant-js
+      , servant-server
       , wai
       , wai-extra
       , wai-middleware-metrics
