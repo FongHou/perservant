@@ -32,7 +32,6 @@ common default-settings
       , DeriveGeneric
       , DeriveLift
       , DeriveTraversable
-      , DerivingStrategies
       , EmptyCase
       , EmptyDataDecls
       , EmptyDataDeriving
@@ -69,10 +68,9 @@ common default-settings
       -Wincomplete-uni-patterns
       -Wpartial-fields
       -Wredundant-constraints
-      -Wno-name-shadowing
-      -Wno-unused-imports
-      -Wno-unused-top-binds
       -fhide-source-paths
+      -fwrite-ide-info
+      -hiedir=.hie
     build-depends:
         base
       , aeson

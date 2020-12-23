@@ -1,11 +1,10 @@
 :set -Wall
 :set -Wno-missing-export-lists
 :set -Wno-name-shadowing
-:set -Wno-partial-type-signatures
 :set -Wno-unused-imports
 :set -Wno-unused-top-binds
 :set -Wno-star-is-type
-
+:set -fdefer-type-errors
 :seti -Wno-missing-signatures
 :seti -Wno-type-defaults
 
