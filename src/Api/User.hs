@@ -1,18 +1,31 @@
 module Api.User where
 
-import Imports
 import Config (AppT (..))
+import Control.Lens
 import Control.Monad.Catch
 import Control.Monad.Logger (logDebugNS)
 import Control.Monad.Metrics (increment, metricsCounters)
 import qualified Control.Monad.Metrics as Metrics
+import Data.Generics.Labels ()
 import Database.Persist.Postgresql
-import Control.Lens
+import Imports
 import Models
 import qualified Models as Md
 import Servant
 import Servant.JS (vanillaJS, writeJSForAPI)
 import qualified System.Metrics.Counter as Counter
+
+data Company = Company {name :: String, owner :: Person}
+  deriving (Show, Generic)
+
+data Person = Person {name :: String, age :: Int}
+  deriving (Show, Generic)
+
+display :: Company -> String
+display c = c.name ++ " is run by " ++ c ^. #owner . #name
+
+nameAfterOwner :: Company -> Company
+nameAfterOwner c = c{name = c.owner.name ++ "'s Company"}
 
 type UserAPI =
   "users" :> Get '[JSON] [Entity User]

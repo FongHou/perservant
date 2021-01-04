@@ -22,12 +22,14 @@ files = serveDirectoryFileServer "assets"
 type AppAPI = SecureAPI :<|> Raw
 
 type SecureAPI = UserAPI
+
 -- type SecureAPI = Auth '[JWT] () :> UserAPI
 -- instance FromJWT ()
 -- instance ToJWT ()
 
 apiServer :: (MonadIO m, MonadThrow m) => ServerT SecureAPI (AppT m)
 apiServer = userServer
+
 -- apiServer (Authenticated _) = userServer
 -- apiServer _ = throwAll err401
 

@@ -8,6 +8,12 @@
 :seti -Wno-missing-signatures
 :seti -Wno-type-defaults
 
+:set -F -pgmF=record-dot-preprocessor
+:set -XDuplicateRecordFields
+:set -XOverloadedLabels
+:set -XOverloadedLists
+:set -XOverloadedStrings
+
 :set -iapp:src
 :set -DDEVELOPMENT
 

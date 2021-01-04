@@ -32,6 +32,7 @@ common default-settings
       , DeriveGeneric
       , DeriveLift
       , DeriveTraversable
+      , DuplicateRecordFields
       , EmptyCase
       , EmptyDataDecls
       , EmptyDataDeriving
@@ -49,6 +50,8 @@ common default-settings
       , NamedWildCards
       , NumericUnderscores
       , OverloadedStrings
+      , OverloadedLabels
+      , OverloadedLists
       , ParallelListComp
       , PolyKinds
       , PostfixOperators
@@ -71,9 +74,11 @@ common default-settings
       -fhide-source-paths
       -fwrite-ide-info
       -hiedir=.hie
+      -F -pgmF=record-dot-preprocessor
     build-depends:
         base
       , aeson
+      , aeson-pretty
       , aeson-schemas
       , async
       , bytestring
@@ -87,10 +92,13 @@ common default-settings
       , monad-control
       , mtl
       , profunctors
+      , record-dot-preprocessor
+      , record-hasfield
       , relude
       , safe-exceptions
       , say
       , stm
+      , stm-containers
       , text
       , time
       , transformers
@@ -114,6 +122,7 @@ common default-settings
       , postgresql-simple
       , product-profunctors
       , resource-pool
+      , retry
       , servant
       , servant-auth
       , servant-auth-server
